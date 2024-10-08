@@ -8,3 +8,5 @@ tensorflow
 scikit-learn
 yfinance==0.2.31
 plotly
+yfinance
+fix_yahoo_finance

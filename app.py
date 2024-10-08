@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pandas_datareader as data
 import plotly.graph_objs as go
+from pandas_datareader import data as pdr
+import fix_yahoo_finance
 
 import yfinance as yf
 from requests.exceptions import HTTPError
@@ -50,7 +52,8 @@ user_input = st.selectbox(
 if user_input == None:
     st.write("No ticker Entered")
 else:
-    df = web.DataReader(user_input, 'stooq', start, end)
+    # df = web.DataReader(user_input, 'stooq', start, end)
+    df = yf.download(user_input, start, end)
 
 
 def get_company_description(ticker_symbol):
