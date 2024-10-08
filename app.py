@@ -33,6 +33,22 @@ st.set_page_config(
 )
 
 st.title('Stock-Ticker Predictor')
+st.image("images/financial-horizontal-banner-business-economy-260nw-624214175.webp",
+        use_column_width="always")
+
+with st.sidebar:
+    st.title("Stock Prediction System using Stacked-LSTM with XGBoost")
+    st.subheader("Ticker-Predictor")
+    st.markdown(
+        """In stock price prediction, the objective is to forecast future prices based on historical data. 
+        The complexity of stock market data, characterized by time dependencies and nonlinear relationships, necessitates the use of advanced machine learning techniques. 
+        One effective approach involves combining Long Short-Term Memory (LSTM) networks with XGBoost, leveraging their strengths for improved predictive performance."""
+    )
+
+    st.success("Deployed", icon="💚")
+    st.header("Contributors")
+    st.markdown("Debasish Ray: [Github](https://github.com/debasishray16)")
+    st.markdown("Utkarsh Raj Sinha: [Github](https://github.com/gamecoder08)")
 
 
 # Taking input from user.
@@ -41,7 +57,8 @@ user_input = st.selectbox(
     "Enter Company Ticker",
     ticker_list,
     index=None,
-    placeholder="Ticker",
+    placeholder="Select Company Ticker",
+    label_visibility="collapsed"
 )
 
 if user_input == None:
@@ -86,6 +103,9 @@ if user_input:
                     ylabel="$"
     )
 
+    with st.expander("See Company's Description"):
+        st.write(f'''{company_description}\n Dataset From: {start} To: {end} (8 Years)''')
+    
     # Metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -97,10 +117,8 @@ if user_input:
     with col4:
         st.metric("52-Week Low", f"${max(df.Low):.2f}")
 
-    st.write(f"Ticker's Desc. {user_input}")
-    with st.expander("See Description"):
-        st.write(f'''{company_description}\n Dataset From: {start} To: {end} (8 Years)''')
-    st.subheader("Dataset Overview")
+    
+    st.subheader("Company Dataset")
     st.dataframe(df)
 
     @st.cache_data
@@ -184,7 +202,7 @@ if user_input:
             plt.plot(ma50, '#b204e8', label='Mean (50 val)')
             plt.plot(ma75, '#f104c8', label='Mean (75 val)')
             plt.plot(ma100, '#43f104', label='Mean (100 val)')
-            plt.plot(df.Close, '#e83a04', label='Closing Price')
+            plt.plot(df.Close, '#2B24DA', label='Closing Price')
             
             plt.title(f'{user_input} Ticker plot')
             plt.legend()
@@ -240,7 +258,7 @@ if user_input:
             container2 = st.container(border=True)
             container2.subheader('Prediction of Stock Ticker')
 
-            with container2.expander("Model Details"):
+            with container2.expander("Model Description"):
                 st.write('''R² value (Coefficient of Determination) measures the proportion of variance in the dependent variable that is predictable from the independent variables. 
                         It ranges from 0 to 1, where 1 indicates a perfect fit, meaning the model explains all the variability in the target variable, while 0 means the model does not explain any variability. 
                         A higher R² value suggests a better fit of the model to the data.
@@ -262,9 +280,22 @@ if user_input:
                     st.metric("MSE Value", f"{0.0011:.4f}")
                 with col3:
                     st.metric("Precision", f"{0.9927:.4f}")
+                
+                
+                model_file_path='8_15_23_125_LXg.h5'
+                
+                with open(model_file_path,'rb') as f:
+                    model_data=f.read()
+                
+                st.download_button(
+                    label="Download Model (.h5 format)",
+                    data=model_data,
+                    file_name="model.h5",
+                    mime="application/octet-stream"
+                )
 
-            with container2.expander("Prediction Graph"):
-                pred_fig2 = plt.figure(figsize=(12, 6))
+            with container2.expander(f"Prediction Graph: {user_input}"):
+                pred_fig2 = plt.figure(figsize=(11, 6))
                 pred_fig2.patch.set_facecolor('#A59DDE')
                 ax = plt.axes()
                 ax.set_facecolor('#C7E1F4')
@@ -272,8 +303,7 @@ if user_input:
                 plt.grid(True, linestyle='--', color='#626784')
                 plt.plot(y_test, 'g', label="Original price")
                 plt.plot(y_predicted, 'r', label="Predicted price")
-
-                plt.title(f'Original and Predicted {user_input} Price')
+                
                 plt.xlabel('No of Days')
                 plt.ylabel('Ticker Price($)')
                 plt.legend()
