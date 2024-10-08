@@ -1,31 +1,27 @@
-import pandas_datareader.data as web
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pandas_datareader as data
 import plotly.graph_objs as go
-from pandas_datareader import data as pdr
-import fix_yahoo_finance
-
 import yfinance as yf
 from requests.exceptions import HTTPError
 import streamlit as st
 
+import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
-
 import keras
 from keras.initializers import Orthogonal
 from keras.optimizers import SGD
-from keras.models import load_model
-import tensorflow as tf
 from tensorflow.python.framework import ops
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Activation
 import tensorflow.compat.v2 as tf
+
 
 keras.initializers.Orthogonal(gain=1.0, seed=None)
 ops.reset_default_graph()
 
+
+# Parameters
 start = '2015-01-01'
 end = '2023-01-01'
 
@@ -39,9 +35,8 @@ st.set_page_config(
 st.title('Stock-Ticker Predictor')
 
 
-
 # Taking input from user.
-ticker_list = ["JPM", "GOOG", "AAPL", "MMM", "MPZ"]
+ticker_list = ["JPM", "GOOG", "AAPL", "MMM", "MPZ", "AMZN","ARCC","MGK","IEP","AAP","ACEL","ACM","ADSK","ATO","SMCI","SRRK","AJX","CBT","CME","ASX","XOM","NVDA","WFC","BA","AAL","MA","AA","AG","APA","AR","PAA","EA"]
 user_input = st.selectbox(
     "Enter Company Ticker",
     ticker_list,
@@ -52,7 +47,6 @@ user_input = st.selectbox(
 if user_input == None:
     st.write("No ticker Entered")
 else:
-    # df = web.DataReader(user_input, 'stooq', start, end)
     df = yf.download(user_input, start, end)
 
 
@@ -63,7 +57,8 @@ def get_company_description(ticker_symbol):
         company_info = ticker_data.info
 
         # Extract the company description
-        company_description = company_info.get('longBusinessSummary', 'Description not available for this company.')
+        company_description = company_info.get(
+            'longBusinessSummary', 'Description not available for this company.')
 
         return company_description
 
@@ -73,6 +68,7 @@ def get_company_description(ticker_symbol):
     except Exception as e:
         return f"Error retrieving company description: {str(e)}"
 
+
 if user_input:
 
     # Fetch company description
@@ -80,10 +76,16 @@ if user_input:
 
     # CandleStick Plot
     st.subheader(f"Ticker: {user_input}")
-    candlestick_chart = go.Figure(data=[go.Candlestick(x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
-    candlestick_chart.update_layout(title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False)
-    st.plotly_chart(candlestick_chart, use_container_width=True, xlabel="Year",ylabel="$")
-    
+    candlestick_chart = go.Figure(data=[go.Candlestick(
+        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
+    candlestick_chart.update_layout(
+        title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False)
+    st.plotly_chart(candlestick_chart, 
+                    use_container_width=True,
+                    xlabel="Year", 
+                    ylabel="$"
+    )
+
     # Metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -95,15 +97,11 @@ if user_input:
     with col4:
         st.metric("52-Week Low", f"${max(df.Low):.2f}")
 
-
     st.write(f"Ticker's Desc. {user_input}")
     with st.expander("See Description"):
         st.write(f'''{company_description}\n Dataset From: {start} To: {end} (8 Years)''')
-
-
     st.subheader("Dataset Overview")
     st.dataframe(df)
-
 
     @st.cache_data
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -118,13 +116,13 @@ if user_input:
         mime="text/csv",
         use_container_width=False
     )
-    
 
     if st.button("Close Feature Prediction", use_container_width=True):
         container1 = st.container(border=True)
         container1.subheader("Close Feature")
-        container1.write("Close feature in a stock prediction system refers to the closing price of a stock for a given trading day.")
-        
+        container1.write(
+            "Close feature in a stock prediction system refers to the closing price of a stock for a given trading day.")
+
         container1.write('''It is the final price at which the stock is traded when the market closes.
                         This is a key metric that investors and analysts use to evaluate stock performance over time.
                         In machine learning models for stock prediction, particularly time-series forecasting, the Close price is often used as the target variable because it captures the final market sentiment of a given trading day.
@@ -132,40 +130,49 @@ if user_input:
                         For instance, positive earnings or the launch of a successful product by a company might drive the closing price higher, while political instability or poor financial results can lead to a dip in the closing price.
                         In technical analysis, the Close price is often used in conjunction with other features like open, high, low, volume, and moving averages to identify trends and patterns that could signal buying or selling opportunities.
         ''')
-        
-        
+
         with container1.expander("Graph: Close Price v/s Time"):
             close_fig = plt.figure(figsize=(10, 6))
             ax = plt.axes()
             ax.set_facecolor('#C7E1F4')
+            
             plt.plot(df.Close, '#2B24DA', label='Closing Price')
+            
             plt.title(f'{user_input} Ticker plot')
             plt.legend()
             plt.xlabel('Year')
             plt.ylabel('Close Price($)')
             plt.grid(True, linestyle='--', color='#BDBDBD')
             plt.tight_layout()
-            st.plotly_chart(close_fig, use_container_width=False, theme="streamlit")
-
+            
+            st.plotly_chart(
+                close_fig, 
+                use_container_width=False, 
+                theme="streamlit"
+            )
 
         with container1.expander("Graph: Close Price v/s Time (with mean)"):
             ma100 = df.Close.rolling(100).mean()
             close_100_fig = plt.figure(figsize=(10, 6))
             ax = plt.axes()
             ax.set_facecolor('#C7E1F4')
-            
+
             plt.plot(ma100, '#43f104', label='Mean (100 val)')
             plt.plot(df.Close, '#2B24DA', label='Closing Price')
+            
             plt.title(f'{user_input} Ticker plot')
             plt.legend()
             plt.xlabel('Year')
             plt.ylabel('Close Price ($)')
-
             plt.grid(True, linestyle='--', color='#BDBDBD')
             plt.tight_layout()
-            st.plotly_chart(close_100_fig, use_container_width=False, theme="streamlit")
-        
-        
+            
+            st.plotly_chart(
+                close_100_fig, 
+                use_container_width=False, 
+                theme="streamlit"
+            )
+
         with container1.expander("Graph: Close Price v/s Time (with mean)"):
             ma100 = df.Close.rolling(100).mean()
             ma50 = df.Close.rolling(50).mean()
@@ -173,37 +180,43 @@ if user_input:
             close_mean_fig = plt.figure(figsize=(10, 6))
             ax = plt.axes()
             ax.set_facecolor('#C7E1F4')
-            
+
             plt.plot(ma50, '#b204e8', label='Mean (50 val)')
             plt.plot(ma75, '#f104c8', label='Mean (75 val)')
             plt.plot(ma100, '#43f104', label='Mean (100 val)')
             plt.plot(df.Close, '#e83a04', label='Closing Price')
+            
             plt.title(f'{user_input} Ticker plot')
             plt.legend()
             plt.xlabel('Year')
             plt.ylabel('Close Price ($)')
             plt.grid(True, linestyle='--', color='#BDBDBD')
             plt.tight_layout()
-            st.plotly_chart(close_mean_fig, use_container_width=False, theme="streamlit")
-
+            
+            st.plotly_chart(
+                close_mean_fig, 
+                use_container_width=False, 
+                theme="streamlit"
+            )
 
         if user_input:
-            
+
             # Model Part
             # splitting the data into training and testing
             data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
-            data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
+            data_testing = pd.DataFrame(
+                df['Close'][int(len(df)*0.70):int(len(df))])
             scaler = MinMaxScaler(feature_range=(0, 1))
             data_training_array = scaler.fit_transform(data_training)
 
-
             # Load Model
-            model = tf.keras.models.load_model('8_15_23_125_LXg.h5', compile=False)
-
+            model = tf.keras.models.load_model(
+                '8_15_23_125_LXg.h5', compile=False)
 
             # Testing part
             past_100_days = data_training.tail(100)
-            final_df = pd.concat([past_100_days, data_testing], ignore_index=True)
+            final_df = pd.concat(
+                [past_100_days, data_testing], ignore_index=True)
 
             input_data = scaler.fit_transform(final_df)
 
@@ -223,9 +236,6 @@ if user_input:
             y_predicted = y_predicted * scale_factor
             y_test = y_test * scale_factor
 
-
-
-
             # Final Graph
             container2 = st.container(border=True)
             container2.subheader('Prediction of Stock Ticker')
@@ -235,16 +245,16 @@ if user_input:
                         It ranges from 0 to 1, where 1 indicates a perfect fit, meaning the model explains all the variability in the target variable, while 0 means the model does not explain any variability. 
                         A higher R² value suggests a better fit of the model to the data.
                 ''')
-                
+
                 st.write('''MSE (Mean Squared Error) quantifies the average squared difference between the actual and predicted values. 
                         A lower MSE indicates that the model's predictions are closer to the true values, making it a critical metric for regression tasks. 
                         The square in MSE emphasizes larger errors, penalizing models that have large prediction deviations.
                 ''')
-                
+
                 st.write('''Precision is primarily used in classification tasks and measures the proportion of true positive predictions out of all positive predictions made by the model.
                         High precision means that the model is very accurate when it predicts a positive instance, though it may miss some positives (false negatives). In essence, precision focuses on the reliability of the positive predictions made by the model.
                 ''')
-                
+
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("R2-Value", f"{0.9749:.4f}")
@@ -253,12 +263,9 @@ if user_input:
                 with col3:
                     st.metric("Precision", f"{0.9927:.4f}")
 
-
             with container2.expander("Prediction Graph"):
-
                 pred_fig2 = plt.figure(figsize=(12, 6))
                 pred_fig2.patch.set_facecolor('#A59DDE')
-
                 ax = plt.axes()
                 ax.set_facecolor('#C7E1F4')
 
@@ -270,7 +277,12 @@ if user_input:
                 plt.xlabel('No of Days')
                 plt.ylabel('Ticker Price($)')
                 plt.legend()
-                st.plotly_chart(pred_fig2, use_container_width=False, theme="streamlit")
+                
+                st.plotly_chart(
+                    pred_fig2, 
+                    use_container_width=False, 
+                    theme="streamlit"
+                )
 
         else:
             container1.write("No dataset generated")
