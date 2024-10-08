@@ -1,4 +1,4 @@
-streamlit==1.38.0
+streamlit
 pandas
 numpy
 matplotlib
@@ -6,7 +6,6 @@ pandas_datareader
 keras
 tensorflow
 scikit-learn
-yfinance==0.2.31
-plotly
 yfinance
+plotly
 fix_yahoo_finance
