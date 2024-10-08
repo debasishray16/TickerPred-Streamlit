@@ -1,4 +1,4 @@
-
+import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,6 +7,8 @@ import plotly.graph_objs as go
 import yfinance as yf
 from requests.exceptions import HTTPError
 import streamlit as st
+import streamlit_lottie
+from streamlit_lottie import st_lottie
 
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
@@ -40,15 +42,15 @@ with st.sidebar:
     st.title("Stock Prediction System using Stacked-LSTM with XGBoost")
     st.subheader("Ticker-Predictor")
     st.markdown(
-        """In stock price prediction, the objective is to forecast future prices based on historical data. 
+        """The objective is to forecast future prices based on historical data. 
         The complexity of stock market data, characterized by time dependencies and nonlinear relationships, necessitates the use of advanced machine learning techniques. 
         One effective approach involves combining Long Short-Term Memory (LSTM) networks with XGBoost, leveraging their strengths for improved predictive performance."""
     )
 
     st.success("Deployed", icon="💚")
     st.header("Contributors")
-    st.markdown("Debasish Ray: [Github](https://github.com/debasishray16)")
-    st.markdown("Utkarsh Raj Sinha: [Github](https://github.com/gamecoder08)")
+    st.success("Debasish Ray [Github](https://github.com/debasishray16)")
+    st.success("Utkarsh Raj Sinha [Github](https://github.com/gamecoder08)")
 
 
 # Taking input from user.
@@ -62,7 +64,10 @@ user_input = st.selectbox(
 )
 
 if user_input == None:
-    st.write("No ticker Entered")
+    st.subheader("No ticker Selected")
+    col1,col2=st.columns([0.2,0.5])
+    with col2:
+        st_lottie("https://lottie.host/7aeb01e2-f5e7-4cdc-9849-f992f90aae13/Igkjy3ONSC.json",key="user", width=450)
 else:
     df = yf.download(user_input, start, end)
 
