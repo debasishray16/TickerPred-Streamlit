@@ -116,6 +116,7 @@ if user_input:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
+        print(max(df.Close))
         st.metric("Max Close Price (8 Years)", f"${max(df.Close):.3f}")
     with col2:
         st.metric("Max Open Price (8 Years)", f"${max(df.Open):.3f}")
