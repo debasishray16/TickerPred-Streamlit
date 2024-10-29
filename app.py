@@ -114,10 +114,10 @@ if user_input:
     
     # Metrics
     col1, col2, col3, col4 = st.columns(4)
-    max_close = int(max(df.Close))
-    max_open = int(max(df.Open))
-    high = int(max(df.High))
-    low = int(max(df.Low))
+    max_close = max(df.Close)
+    max_open = max(df.Open)
+    high = max(df.High)
+    low = max(df.Low)
     with col1:
         st.metric("Max Close Price (8 Years)", f"${float(max_close):.3f}")
     with col2:
