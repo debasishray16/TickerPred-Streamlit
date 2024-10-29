@@ -119,13 +119,13 @@ if user_input:
     high = max(df.High)
     low = max(df.Low)
     with col1:
-        st.metric("Max Close Price (8 Years)", f"${float(max_close):.2f}")
+        st.metric("Max Close Price (8 Years)", f"${float(max_close):.3f}")
     with col2:
-        st.metric("Max Open Price (8 Years)", f"${float(max_open):.2f}")
+        st.metric("Max Open Price (8 Years)", f"${float(max_open):.3f}")
     with col3:
-        st.metric("52-Week High", f"${float(high):.2f}")
+        st.metric("52-Week High", f"${float(high):.3f}")
     with col4:
-        st.metric("52-Week Low", f"${float(low):.2f}")
+        st.metric("52-Week Low", f"${float(low):.3f}")
 
     
     st.subheader("Company Dataset")
