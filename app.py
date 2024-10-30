@@ -50,6 +50,12 @@ with st.sidebar:
     st.success("Utkarsh Raj Sinha [Github](https://github.com/gamecoder08)")
 
 
+_1, _2 = st.columns([0.5, 0.5])
+with _1:
+    start = st.date_input("Start Date", value=None)
+with _2:
+    end = st.date_input("End Date", value=pd.to_datetime("today"))
+
 # Taking input from user.
 ticker_list = symbol_list
 user_input = st.selectbox(
@@ -60,12 +66,6 @@ user_input = st.selectbox(
     label_visibility="collapsed"
 )
 
-# Parameters
-_1 , _2 =st.columns([0.5,0.5])
-with _1:
-    start = st.date_input("Start-Date", value=None)
-with _2:
-    end = st.date_input("End Date", value=None)
 
 
 if user_input == None:
@@ -105,9 +105,6 @@ if user_input:
     st.subheader(f"Ticker: {user_input}")
     candlestick_chart = go.Figure(data=[go.Candlestick(
         x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
-    
-    candlestick_chart1 = go.Figure(data=[go.Candlestick(
-        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
         
     candlestick_chart.add_trace(
         go.Bar(x=df.index, y=df['Volume'], name='Volume'))
@@ -118,6 +115,8 @@ if user_input:
                     xlabel="Year", 
                     ylabel="$"
     )
+    candlestick_chart1 = go.Figure(data=[go.Candlestick(
+        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
     st.plotly_chart(candlestick_chart1,
                     use_container_width=True,
                     xlabel="Year",
@@ -126,25 +125,38 @@ if user_input:
 
     with st.expander("See Company's Description"):
         st.write(f'''{company_description}''')
-    
+        
+
+
     # Metrics
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if isinstance(max(df.Close), str):
+        # error handling
+        if isinstance(max(df['Close']), str):
             # If it's a string, display it directly
-            st.metric("Max Close Price (8 Years)", max(df[[][0]]))
+            st.metric("Max Close Price", max(df['Close']))
         else:
             # If it's a number, format with f-string
-            st.metric("Max Close Price (8 Years)", f"${max(df[[][0]]):.3f}")
+            st.metric("Max Close Price", f"${max(df['Close']):.2f}")
 
     with col2:
-        
-        st.metric("Max Open Price (8 Years)", f"${max(df.Open):.3f}")
+        if isinstance(max(df['Open']),str):
+            st.metric("Max Open Price", max(df['Open']))
+        else:
+            st.metric("Max Open Price", f"${max(df['Open']):.2f}")
+
     with col3:
-        st.metric("52-Week High", f"${max(df.High):.3f}")
+        if isinstance(max(df['High']),str):
+            st.metric("52-Week High",df['High'])
+        else:
+            st.metric("52-Week High", f"${max(df['High']):.2f}")
+
     with col4:
-        st.metric("52-Week Low", f"${max(df.Low):.3f}")
+        if isinstance(max(df['Low']),str):
+            st.metric("52-Week Low", df['Low'])
+        else:
+            st.metric("52-Week Low", f"${max(df['Low']):.2f}")
 
     
     st.subheader("Company Dataset")
