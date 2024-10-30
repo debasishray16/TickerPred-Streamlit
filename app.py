@@ -24,11 +24,6 @@ import tensorflow.compat.v2 as tf
 keras.initializers.Orthogonal(gain=1.0, seed=None)
 ops.reset_default_graph()
 
-
-# Parameters
-start = '2015-01-01'
-end = '2023-01-01'
-
 # Page Layout
 st.set_page_config(
     page_title="Stock Prediction System",
@@ -37,6 +32,7 @@ st.set_page_config(
 )
 
 st.title('Stock-Ticker Predictor')
+
 
 
 with st.sidebar:
@@ -63,6 +59,14 @@ user_input = st.selectbox(
     placeholder="Select Company Ticker",
     label_visibility="collapsed"
 )
+
+# Parameters
+_1 , _2 =st.columns([0.5,0.5])
+with _1:
+    start = st.date_input("Start-Date", value=None)
+with _2:
+    end = st.date_input("End Date", value=None)
+
 
 if user_input == None:
     st.subheader("No ticker Selected")
@@ -101,6 +105,12 @@ if user_input:
     st.subheader(f"Ticker: {user_input}")
     candlestick_chart = go.Figure(data=[go.Candlestick(
         x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
+    
+    candlestick_chart1 = go.Figure(data=[go.Candlestick(
+        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
+        
+    candlestick_chart.add_trace(
+        go.Bar(x=df.index, y=df['Volume'], name='Volume'))
     candlestick_chart.update_layout(
         title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False)
     st.plotly_chart(candlestick_chart, 
@@ -108,6 +118,11 @@ if user_input:
                     xlabel="Year", 
                     ylabel="$"
     )
+    st.plotly_chart(candlestick_chart1,
+                    use_container_width=True,
+                    xlabel="Year",
+                    ylabel="$"
+                    )
 
     with st.expander("See Company's Description"):
         st.write(f'''{company_description}''')
@@ -236,8 +251,7 @@ if user_input:
             data_training_array = scaler.fit_transform(data_training)
 
             # Load Model
-            model = tf.keras.models.load_model(
-                '8_15_23_125_LXg.h5', compile=False)
+            model = tf.keras.models.load_model('8_15_23_125_LXg.h5', compile=False)
 
             # Testing part
             past_100_days = data_training.tail(100)
