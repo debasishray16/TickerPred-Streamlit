@@ -103,25 +103,27 @@ if user_input:
 
     # CandleStick Plot
     st.subheader(f"Ticker: {user_input}")
+    
+    candlestick_chart1 = go.Figure(data=[go.Candlestick(
+        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
+    candlestick_chart1.update_layout(
+        title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False, xaxis_title='Date', yaxis_title='Price')
+    st.plotly_chart(candlestick_chart1,
+                    use_container_width=True,
+                    )
+    
+    
     candlestick_chart = go.Figure(data=[go.Candlestick(
         x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
         
     candlestick_chart.add_trace(
         go.Bar(x=df.index, y=df['Volume'], name='Volume'))
     candlestick_chart.update_layout(
-        title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False)
+        title=f"{user_input} Candlestick Chart", xaxis_rangeslider_visible=False,xaxis_title='Date',yaxis_title='Volume')
     st.plotly_chart(candlestick_chart, 
                     use_container_width=True,
-                    xlabel="Year", 
-                    ylabel="$"
     )
-    candlestick_chart1 = go.Figure(data=[go.Candlestick(
-        x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
-    st.plotly_chart(candlestick_chart1,
-                    use_container_width=True,
-                    xlabel="Year",
-                    ylabel="$"
-                    )
+
 
     with st.expander("See Company's Description"):
         st.write(f'''{company_description}''')
