@@ -133,10 +133,10 @@ if user_input:
     with col1:
         if isinstance(max(df.Close), str):
             # If it's a string, display it directly
-            st.metric("Max Close Price (8 Years)", max(df.Close))
+            st.metric("Max Close Price (8 Years)", max(df[[][0]]))
         else:
             # If it's a number, format with f-string
-            st.metric("Max Close Price (8 Years)", f"${max(df.Close):.3f}")
+            st.metric("Max Close Price (8 Years)", f"${max(df[[][0]]):.3f}")
 
     with col2:
         
