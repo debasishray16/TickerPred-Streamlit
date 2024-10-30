@@ -131,9 +131,15 @@ if user_input:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        print(max(df.Close))
-        st.metric("Max Close Price (8 Years)", f"${max(df.Close):.3f}")
+        if isinstance(max(df.Close), str):
+            # If it's a string, display it directly
+            st.metric("Max Close Price (8 Years)", max(df.Close))
+        else:
+            # If it's a number, format with f-string
+            st.metric("Max Close Price (8 Years)", f"${max(df.Close):.3f}")
+
     with col2:
+        
         st.metric("Max Open Price (8 Years)", f"${max(df.Open):.3f}")
     with col3:
         st.metric("52-Week High", f"${max(df.High):.3f}")
